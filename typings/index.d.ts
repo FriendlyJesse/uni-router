@@ -1,15 +1,9 @@
-interface Event {
-  [name: string]: Function[]
-}
-
-interface Options {
-  reconnectMax?: number
-  reconnectTime?: number
-  heartTimeout?: number
-  logger?: Boolean
+interface route {
+  path: string,
+  name?: string,
+  style?: Object
 }
 
 export {
-  Event,
-  Options
+  route
 }

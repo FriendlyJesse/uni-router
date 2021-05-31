@@ -1,14 +1,14 @@
 {
-  "name": "@friendlyjesse/uni-socket",
+  "name": "@friendlyjesse/uni-router",
   "version": "1.0.0",
-  "description": "uni-app 版 socket 封装",
+  "description": "uni-app 路由封装",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.esm.js",
   "typings": "dist/index.d.ts",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/FriendlyJesse/uni-socket.git"
+    "url": "https://github.com/FriendlyJesse/uni-router.git"
   },
   "files": [
     "dist"
@@ -21,15 +21,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "socket",
-    "websocket",
+    "router",
+    "路由",
     "uniapp",
-    "uniapp socket"
+    "uniapp 路由",
+    "uniapp 路由封装"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@friendlyjesse/library": "^1.0.4"
+    "@friendlyjesse/library": "^1.0.6"
   },
   "devDependencies": {
     "@dcloudio/types": "^2.2.4",
