@@ -1,16 +1,16 @@
 import { json2params, deepClone } from '@friendlyjesse/library'
 
-import { route } from '../typings'
+import { Route, InterceptEvent } from '../typings'
 
 /**
  * 路由跳转方法
  * @author Jesse <jessexinyu@foxmail.com>
  */
 class Router {
-  routes: route[] = []
-  interceptEvent: Function[] = []
+  routes: Route[] = []
+  interceptEvent: InterceptEvent = {}
 
-  constructor (routes: route[]) {
+  constructor (routes: Route[]) {
     this.routes = routes
   }
 
@@ -78,14 +78,23 @@ class Router {
 
   async execute (type: string, ...reset: any[]) {
     const mergeOption = this.mixinOption(...reset)
-
+    const to = mergeOption
+    const from = this.getRoute(this.getCurrentUrl(), 'path')
     // 拦截器
-    await new Promise((resolve, reject) => {
-      const to = this.getRoute(mergeOption.name)
-      const from = this.getRoute(this.getCurrentUrl(), 'path')
+    const result: any = await new Promise((resolve, reject) => {
       this.intercept(to, from, resolve)
-    });
-    (uni as any)[type](mergeOption)
+    })
+    if (result) {
+      const { type, ...options } = result
+      if (['navigateTo', 'redirectTo', 'switchTab', 'reLaunch', 'navigateBack'].includes(type)) {
+        (this as any)[type](options)
+      } else {
+        throw Error('next 不存在这个 type ！')
+      }
+    } else {
+      this.interceptEvent.afterEach && this.interceptEvent.afterEach(to, from);
+      (uni as any)[type](mergeOption)
+    }
   }
 
   /**
@@ -96,13 +105,18 @@ class Router {
    * @returns 合并后的 options
    */
   mixinOption (options: object | string = {}, params: object = {}) {
-    const mergeOption = deepClone(options)
+    let mergeOption: any
     if (typeof options === 'string') { // 如果 options 为字符串，则为 navigateTo(url, params) 的形式
-      mergeOption.url = options + '?' + json2params(params)
+      const isName = options.indexOf('/') === -1
+      const route = this.getRoute(options, isName ? 'name' : 'path')
+      mergeOption = Object.assign({}, route, { params })
+      mergeOption.url = route.path + '?' + (params && json2params(params))
     } else {
-      const { name, url, params } = mergeOption
-      const currentUrl = (name ? this.getRoute(name).path : url) + '?' + json2params(params)
-      mergeOption.url = currentUrl
+      mergeOption = deepClone(options)
+      const { name, params } = mergeOption
+      const route = this.getRoute(name)
+      mergeOption = Object.assign({}, route, mergeOption)
+      mergeOption.url = route.path + '?' + (params && json2params(params))
     }
     return mergeOption
   }
@@ -114,11 +128,11 @@ class Router {
    * @returns 路由信息
    */
   getRoute (param: string, type = 'name') {
-    const route = this.routes.find((item: any) => item[type] === (type === 'name' ? param : '/' + param))
+    const route = this.routes.find((item: any) => item[type] === param)
     if (route) {
       return route
     } else {
-      throw Error(`${name}对应的路由不存在`)
+      throw Error(`${param}对应的路由不存在`)
     }
   }
 
@@ -130,7 +144,7 @@ class Router {
     // eslint-disable-next-line no-undef
     const pages = getCurrentPages()
     const currentPage = pages[pages.length - 1]
-    return currentPage.route as string
+    return '/' + currentPage.route as string
   }
 
   /**
@@ -141,10 +155,9 @@ class Router {
    * @param {*} next 一定要调用该方法来 resolve 这个钩子
    */
   intercept (to: object, from: object, next: Function) {
-    if (this.interceptEvent.length) {
-      this.interceptEvent.forEach((callback: Function) => {
-        callback(to, from, next)
-      })
+    const events = Object.keys(this.interceptEvent)
+    if (events.length) {
+      this.interceptEvent.beforeEach && this.interceptEvent.beforeEach(to, from, next)
     } else {
       next()
     }
@@ -152,10 +165,18 @@ class Router {
 
   /**
    * 全局前置守卫
-   * @param {*} callback 前置守卫回调
+   * @param callback 前置守卫回调
    */
   beforeEach (callback: Function) {
-    this.interceptEvent.push(callback)
+    this.interceptEvent.beforeEach = callback
+  }
+
+  /**
+   * 全局后置守卫
+   * @param callback 后置守卫回调
+   */
+  afterEach (callback: Function) {
+    this.interceptEvent.afterEach = callback
   }
 }
 
