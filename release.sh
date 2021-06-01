@@ -9,9 +9,9 @@ npm run build
 git add .
 git commit -m 'release'
 git push
-git checkout master
-git merge dev
-git push
+# git checkout master
+# git merge dev
+# git push
 
 npm publish -access public
 
