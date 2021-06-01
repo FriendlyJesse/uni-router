@@ -76,7 +76,17 @@ class Router {
     this.execute('navigateBack', ...reset)
   }
 
+  install (Vue: any) {
+    Object.defineProperty(Vue.prototype, '$Router', {
+      get: () => { return this }
+    })
+  }
+
   async execute (type: string, ...reset: any[]) {
+    if (type === 'navigateBack') {
+      (uni as any)[type](...reset)
+      return
+    }
     const mergeOption = this.mixinOption(...reset)
     const to = mergeOption
     const from = this.getRoute(this.getCurrentUrl(), 'path')
