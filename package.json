@@ -1,6 +1,6 @@
 {
   "name": "@friendlyjesse/uni-router",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "uni-app 路由封装",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.esm.js",
