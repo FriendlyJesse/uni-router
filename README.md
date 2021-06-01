@@ -54,6 +54,17 @@ this.$Router.navigateTo({ // option 式跳转
 目前支持的有：`navigateTo`、`redirectTo`、`switchTab`、`reLaunch`、`navigateBack`
 配置详情同：https://uniapp.dcloud.net.cn/api/router?id=navigateto
 
+## 获取当前url
+```javascript
+this.$Router.getCurrentUrl()
+```
+
+## 获取路由
+```javascript
+this.$Router.getRoute(name)
+this.$Router.getRoute(path)
+```
+
 ## 全局钩子
 
 ### 前置钩子
