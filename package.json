@@ -1,6 +1,6 @@
 {
   "name": "@friendlyjesse/uni-router",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "uni-app 路由封装",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.esm.js",
@@ -30,7 +30,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@friendlyjesse/library": "^1.0.6"
+    "@friendlyjesse/library": "^1.0.9"
   },
   "devDependencies": {
     "@dcloudio/types": "^2.2.4",

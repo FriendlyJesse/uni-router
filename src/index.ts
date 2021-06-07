@@ -1,4 +1,4 @@
-import { json2params, deepClone } from '@friendlyjesse/library'
+import { json2params, deepClone, getUrlResolve } from '@friendlyjesse/library'
 
 import { Route, InterceptEvent } from '../typings'
 
@@ -117,9 +117,19 @@ class Router {
   mixinOption (options: object | string = {}, params: object = {}) {
     let mergeOption: any
     if (typeof options === 'string') { // 如果 options 为字符串，则为 navigateTo(url, params) 的形式
-      const isName = options.indexOf('/') === -1
-      const route = this.getRoute(options, isName ? 'name' : 'path')
+      const isPath = options.indexOf('/') !== -1
+      const carryParams = options.indexOf('?') !== -1
+
+      let path = ''
+      if (isPath && carryParams) { // 如果 path 携带参数
+        const res = getUrlResolve(options)
+        path = res.path
+        params = Object.assign({}, res.params, params)
+      }
+
+      const route = this.getRoute(carryParams ? path : options, isPath ? 'path' : 'name')
       mergeOption = Object.assign({}, route, { params })
+
       mergeOption.url = route.path + '?' + (params && json2params(params))
     } else {
       mergeOption = deepClone(options)
